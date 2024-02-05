@@ -29,6 +29,7 @@
     function randomizeList(list, dateString) {
         Math.seedrandom(dateString);
 
+        list.sort(); // Sort the list to make the randomization deterministic
         for (let i = list.length - 1; i > 0; i--) {
             let j = Math.floor(Math.random() * (i + 1));
             [list[i], list[j]] = [list[j], list[i]];
@@ -39,7 +40,7 @@
     function updateResult(text) {
         const uniqueList = [...new Set(text.split('\n').filter(Boolean))];
         const textarea = document.querySelector('#result');
-        const processedList = randomizeList(uniqueList, new Date().toLocaleDateString('en-GB'))
+        const processedList = randomizeList(uniqueList, new Date().toLocaleDateString('en-GB'));
 
         if (processedList.length == 0) {
             textarea.value = '';
