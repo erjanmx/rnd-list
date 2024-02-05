@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>RND-LIST</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/seedrandom/3.0.5/seedrandom.min.js"></script>
+</head>
+<body>
+  <div id="app" class="container is-fluid is-widescreen">
+    <section class="section">
+      <div class="content">
+        <h1 class="title">
+          RND-LIST
+        </h1>
+        <div class="columns is-vcentered">
+            <div class="column">
+                <textarea id="list" class="textarea" placeholder="Put your items to randomize, each item on a new line" rows="20"></textarea>
+            </div>
+            <div class="column">
+                <textarea id="result" readonly class="textarea" placeholder="Your list for today will appear here" rows="20"></textarea>
+            </div>
+        </div>
+    </section>
+  </div>
+</body>
+<script type="text/javascript">
+    function randomizeList(list, dateString) {
+        Math.seedrandom(dateString);
+
+        for (let i = list.length - 1; i > 0; i--) {
+            let j = Math.floor(Math.random() * (i + 1));
+            [list[i], list[j]] = [list[j], list[i]];
+        }
+        return list;
+    }
+
+    function updateResult(text) {
+        const uniqueList = [...new Set(text.split('\n').filter(Boolean))];
+        const textarea = document.querySelector('#result');
+        const processedList = randomizeList(uniqueList, new Date().toLocaleDateString('en-GB'))
+
+        if (processedList.length == 0) {
+            textarea.value = '';
+        } else {
+            textarea.value = "Randomized list for today\n\n" + processedList.join('\n');
+        }
+    }
+
+    window.onload = function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const listParam = urlParams.get('list');
+        const textarea = document.querySelector('#list');
+
+        if (listParam) {
+            textarea.value = listParam.split(',').join('\n');
+            updateResult(textarea.value);
+        }
+
+        textarea.addEventListener('input', function() {
+            window.history.replaceState({}, '', '?list=' + textarea.value.split('\n').join(','));
+            updateResult(textarea.value);
+        });
+    }
+</script>
+</html>
